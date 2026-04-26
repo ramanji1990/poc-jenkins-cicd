@@ -21,7 +21,7 @@ pipeline {
         stage("Checkout Code") {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/ramanji1990/poc-jenkins-cicd.git'
+                url: 'https://github.com/YOUR_GITHUB_USERNAME/java-aks-trivy-project.git'
             }
         }
 
@@ -32,6 +32,26 @@ pipeline {
                 mvn -version
                 mvn clean package
                 """
+            }
+        }
+
+        stage("SonarQube Code Scan") {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh """
+                    mvn clean verify sonar:sonar \
+                      -Dsonar.projectKey=java-aks-app \
+                      -Dsonar.projectName=java-aks-app
+                    """
+                }
+            }
+        }
+
+        stage("SonarQube Quality Gate") {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
@@ -128,11 +148,11 @@ pipeline {
         }
 
         success {
-            echo "Build, scan, push, and AKS deployment completed successfully"
+            echo "Build, Sonar scan, Trivy scan, Docker push, and AKS deployment completed successfully"
         }
 
         failure {
-            echo "Pipeline failed. Check Jenkins console logs and Trivy report"
+            echo "Pipeline failed. Check Jenkins console logs, SonarQube, and Trivy report"
         }
     }
 }
