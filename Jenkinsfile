@@ -140,28 +140,6 @@ pipeline {
                 '''
             }
         }
-
-        stage("Deploy Portainer Monitoring") {
-            steps {
-                sh '''
-                # Install Helm if not present
-                if ! command -v helm &> /dev/null
-                then
-                    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-                fi
-
-                helm repo add portainer https://portainer.github.io/k8s/ || true
-                helm repo update
-
-                helm upgrade --install portainer portainer/portainer \
-                  --namespace portainer \
-                  --create-namespace \
-                  --set service.type=LoadBalancer
-
-                kubectl get svc -n portainer
-                '''
-            }
-        }
     }
 
     post {
@@ -170,7 +148,7 @@ pipeline {
         }
 
         success {
-            echo "CI/CD + Security + Monitoring pipeline completed successfully 🚀"
+            echo "CI/CD + DevSecOps pipeline completed successfully 🚀"
         }
 
         failure {
