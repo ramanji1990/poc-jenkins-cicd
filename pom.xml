@@ -9,7 +9,7 @@
     <artifactId>java-aks-app</artifactId>
     <version>1.0.0</version>
 
-    <!-- 🔥 Updated Spring Boot (fix vulnerabilities) -->
+    <!-- 🔥 Latest Spring Boot -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -19,20 +19,29 @@
 
     <properties>
         <java.version>17</java.version>
+        <!-- 🔐 Force patched Tomcat -->
+        <tomcat.version>10.1.53</tomcat.version>
     </properties>
 
     <dependencies>
 
-        <!-- Web Starter (includes updated Tomcat) -->
+        <!-- Web Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Actuator (optional but useful for health checks in AKS) -->
+        <!-- Actuator (for Kubernetes health checks) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- 🔐 Override Tomcat to fix CRITICAL vulnerability -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>${tomcat.version}</version>
         </dependency>
 
     </dependencies>
