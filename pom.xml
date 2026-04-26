@@ -9,11 +9,11 @@
     <artifactId>java-aks-app</artifactId>
     <version>1.0.0</version>
 
-    <!-- ✅ Spring Boot Parent -->
+    <!-- 🔥 Updated Spring Boot (fix vulnerabilities) -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.4.5</version>
         <relativePath/>
     </parent>
 
@@ -23,13 +23,13 @@
 
     <dependencies>
 
-        <!-- ✅ Spring Boot Web -->
+        <!-- Web Starter (includes updated Tomcat) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Optional -->
+        <!-- Actuator (optional but useful for health checks in AKS) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -40,16 +40,17 @@
     <build>
         <plugins>
 
-            <!-- ✅ Spring Boot Plugin -->
+            <!-- Spring Boot Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- Sonar Plugin -->
+            <!-- SonarQube Plugin -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.10.0.2594</version>
             </plugin>
 
         </plugins>
