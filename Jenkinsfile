@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk17'
-        maven 'maven3'
+        jdk 'Java_17'
+        maven 'maven_3.3.9'
     }
 
     environment {
@@ -21,7 +21,7 @@ pipeline {
         stage("Checkout Code") {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/YOUR_GITHUB_USERNAME/java-aks-trivy-project.git'
+                url: 'https://github.com/ramanji1990/poc-jenkins-cicd.git'
             }
         }
 
@@ -39,7 +39,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('sonar-server') {
                     sh """
-                    mvn clean verify sonar:sonar \
+                    mvn sonar:sonar \
                       -Dsonar.projectKey=java-aks-app \
                       -Dsonar.projectName=java-aks-app
                     """
@@ -152,7 +152,7 @@ pipeline {
         }
 
         failure {
-            echo "Pipeline failed. Check Jenkins console logs, SonarQube, and Trivy report"
+            echo "Pipeline failed. Check Jenkins logs, SonarQube, and Trivy report"
         }
     }
 }
