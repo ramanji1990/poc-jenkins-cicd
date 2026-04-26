@@ -27,22 +27,22 @@ pipeline {
 
         stage("Maven Build") {
             steps {
-                sh """
+                sh '''
                 java -version
                 mvn -version
                 mvn clean package
-                """
+                '''
             }
         }
 
         stage("SonarQube Code Scan") {
             steps {
                 withSonarQubeEnv('sonar') {
-                    sh """
+                    sh '''
                     mvn sonar:sonar \
                       -Dsonar.projectKey=java-aks-app \
                       -Dsonar.projectName=java-aks-app
-                    """
+                    '''
                 }
             }
         }
@@ -57,24 +57,23 @@ pipeline {
 
         stage("Build Docker Image") {
             steps {
-                sh """
+                sh '''
                 docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-                """
+                '''
             }
         }
 
         stage("Trivy HTML Report") {
             steps {
-                sh """
+                sh '''
                 mkdir -p trivy-report
-
                 trivy image \
                   --format template \
                   --template "@/usr/local/share/trivy/templates/html.tpl" \
                   --output trivy-report/trivy-report.html \
                   ${IMAGE_NAME}:${IMAGE_TAG}
-                """
+                '''
             }
         }
 
@@ -93,31 +92,31 @@ pipeline {
 
         stage("Trivy Security Gate") {
             steps {
-                sh """
+                sh '''
                 trivy image \
                   --exit-code 1 \
                   --severity CRITICAL \
                   ${IMAGE_NAME}:${IMAGE_TAG}
-                """
+                '''
             }
         }
 
         stage("DockerHub Login") {
             steps {
-                sh """
+                sh '''
                 echo ${DOCKERHUB_CRED_PSW} | docker login \
                   -u ${DOCKERHUB_CRED_USR} \
                   --password-stdin
-                """
+                '''
             }
         }
 
         stage("Push Image to DockerHub") {
             steps {
-                sh """
+                sh '''
                 docker push ${IMAGE_NAME}:${IMAGE_TAG}
                 docker push ${IMAGE_NAME}:latest
-                """
+                '''
             }
         }
 
@@ -141,6 +140,28 @@ pipeline {
                 '''
             }
         }
+
+        stage("Deploy Portainer Monitoring") {
+            steps {
+                sh '''
+                # Install Helm if not present
+                if ! command -v helm &> /dev/null
+                then
+                    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+                fi
+
+                helm repo add portainer https://portainer.github.io/k8s/ || true
+                helm repo update
+
+                helm upgrade --install portainer portainer/portainer \
+                  --namespace portainer \
+                  --create-namespace \
+                  --set service.type=LoadBalancer
+
+                kubectl get svc -n portainer
+                '''
+            }
+        }
     }
 
     post {
@@ -149,11 +170,11 @@ pipeline {
         }
 
         success {
-            echo "Build, Sonar scan, Trivy scan, Docker push, and AKS deployment completed successfully"
+            echo "CI/CD + Security + Monitoring pipeline completed successfully 🚀"
         }
 
         failure {
-            echo "Pipeline failed. Check Jenkins logs, SonarQube, Trivy report, DockerHub, or AKS"
+            echo "Pipeline failed. Check logs"
         }
     }
 }
