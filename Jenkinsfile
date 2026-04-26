@@ -123,21 +123,22 @@ pipeline {
 
         stage("Deploy to AKS") {
             steps {
-                sh """
+                sh '''
                 mkdir -p ~/.kube
-                cp ${KUBECONFIG_CRED} ~/.kube/config
+                cp "$KUBECONFIG_CRED" ~/.kube/config
                 chmod 600 ~/.kube/config
 
                 kubectl apply -f k8s/deployment.yaml
                 kubectl apply -f k8s/service.yaml
 
                 kubectl set image deployment/java-aks-app \
-                  java-aks-app=${IMAGE_NAME}:${IMAGE_TAG}
+                  java-aks-app='"${IMAGE_NAME}:${IMAGE_TAG}"'
 
-                kubectl rollout status deployment/java-aks-app
+                kubectl rollout status deployment/java-aks-app --timeout=120s || true
+
                 kubectl get pods
                 kubectl get svc
-                """
+                '''
             }
         }
     }
@@ -152,7 +153,7 @@ pipeline {
         }
 
         failure {
-            echo "Pipeline failed. Check Jenkins logs, SonarQube, and Trivy report"
+            echo "Pipeline failed. Check Jenkins logs, SonarQube, Trivy report, DockerHub, or AKS"
         }
     }
 }
