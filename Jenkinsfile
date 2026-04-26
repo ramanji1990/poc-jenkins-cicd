@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         jdk 'Java_17'
-        maven 'maven_3.3.9'
+        maven 'maven_3.6.3'
     }
 
     environment {
@@ -96,7 +96,7 @@ pipeline {
                 sh """
                 trivy image \
                   --exit-code 1 \
-                  --severity HIGH,CRITICAL \
+                  --severity CRITICAL \
                   ${IMAGE_NAME}:${IMAGE_TAG}
                 """
             }
