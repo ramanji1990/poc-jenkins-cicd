@@ -37,7 +37,7 @@ pipeline {
 
         stage("SonarQube Code Scan") {
             steps {
-                withSonarQubeEnv('sonar-server') {
+                withSonarQubeEnv('sonar') {
                     sh """
                     mvn sonar:sonar \
                       -Dsonar.projectKey=java-aks-app \
